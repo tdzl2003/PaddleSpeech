@@ -87,11 +87,6 @@ def tts(request_body: TTSRequest):
         return failed_response(
             ErrorCode.SERVER_PARAM_ERR,
             "invalid sample_rate value, the choice of value is 0, 8000, 16000.")
-    if save_path is not None and not save_path.endswith(
-            "pcm") and not save_path.endswith("wav"):
-        return failed_response(
-            ErrorCode.SERVER_PARAM_ERR,
-            "invalid save_path, saved audio formats support pcm and wav")
 
     # run
     try:
@@ -110,7 +105,7 @@ def tts(request_body: TTSRequest):
 
         connection_handler = PaddleTTSConnectionHandler(tts_engine)
         lang, target_sample_rate, duration, wav_base64 = connection_handler.run(
-            text, spk_id, speed, volume, sample_rate, save_path)
+            text, spk_id, speed, volume, sample_rate)
 
         response = {
             "success": True,
@@ -125,7 +120,6 @@ def tts(request_body: TTSRequest):
                 "volume": volume,
                 "sample_rate": target_sample_rate,
                 "duration": duration,
-                "save_path": save_path,
                 "audio": wav_base64
             }
         }

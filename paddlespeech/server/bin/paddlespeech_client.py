@@ -80,6 +80,9 @@ class TTSClientExecutor(BaseExecutor):
             help='Sampling rate, the default is the same as the model')
         self.parser.add_argument(
             '--output', type=str, default=None, help='Synthesized audio file')
+        self.parser.add_argument(
+            "--play", type=bool, help="whether to play audio", default=False)
+
 
     def postprocess(self, wav_base64: str, outfile: str) -> float:
         audio_data_byte = base64.b64decode(wav_base64)
@@ -108,10 +111,11 @@ class TTSClientExecutor(BaseExecutor):
         volume = args.volume
         sample_rate = args.sample_rate
         output = args.output
+        play = args.play
 
         try:
             time_start = time.time()
-            res = self(
+            response_dict = self(
                 input=input_,
                 server_ip=server_ip,
                 port=port,
@@ -119,14 +123,19 @@ class TTSClientExecutor(BaseExecutor):
                 speed=speed,
                 volume=volume,
                 sample_rate=sample_rate,
-                output=output)
+                output=output,
+                play=play
+            )
             time_end = time.time()
             time_consume = time_end - time_start
-            response_dict = res.json()
             logger.info("Save synthesized audio successfully on %s." % (output))
             logger.info("Audio duration: %f s." %
                         (response_dict['result']['duration']))
             logger.info("Response time: %f s." % (time_consume))
+
+            if play:
+                self.t.start()
+                self.t.join()
             return True
         except Exception as e:
             logger.error("Failed to synthesized audio.")
@@ -142,7 +151,8 @@ class TTSClientExecutor(BaseExecutor):
                  speed: float=1.0,
                  volume: float=1.0,
                  sample_rate: int=0,
-                 output: str=None):
+                 output: str=None,
+                 play: bool = False):
         """
         Python API to call an executor.
         """
@@ -153,15 +163,35 @@ class TTSClientExecutor(BaseExecutor):
             "spk_id": spk_id,
             "speed": speed,
             "volume": volume,
-            "sample_rate": sample_rate,
-            "save_path": output
+            "sample_rate": sample_rate
         }
 
         res = requests.post(url, json.dumps(request))
         response_dict = res.json()
         if output is not None:
             self.postprocess(response_dict["result"]["audio"], output)
-        return res
+        if play:
+            import threading
+            self.sample_rate = response_dict["result"]["sample_rate"]
+            self.buffer = base64.b64decode(response_dict["result"]["audio"])
+
+            self.t = threading.Thread(target=self.play_audio)
+        return response_dict
+        
+    def play_audio(self):
+        import pyaudio
+
+        p = pyaudio.PyAudio()
+
+        stream = p.open(
+            format=p.get_format_from_width(2),
+            channels=1,
+            rate=self.sample_rate,
+            output=True)
+        stream.write(self.buffer[44:])
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
 
 
 @cli_client_register(
