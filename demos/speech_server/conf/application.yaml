@@ -9,7 +9,7 @@ port: 8090
 # The task format in the engin_list is: <speech task>_<engine type>
 # task choices = ['asr_python', 'asr_inference', 'tts_python', 'tts_inference', 'cls_python', 'cls_inference', 'text_python', 'vector_python']
 protocol: 'http'
-engine_list: ['asr_python', 'tts_python', 'cls_python', 'text_python', 'vector_python']
+engine_list: ['tts_python']
 
 
 #################################################################################
@@ -54,7 +54,7 @@ tts_python:
     #                             'fastspeech2_ljspeech', 'fastspeech2_aishell3',
     #                             'fastspeech2_vctk', 'fastspeech2_mix',
     #                             'tacotron2_csmsc', 'tacotron2_ljspeech']
-    am: 'fastspeech2_csmsc'   
+    am: 'fastspeech2_mix'   
     am_config: 
     am_ckpt: 
     am_stat: 
@@ -67,14 +67,14 @@ tts_python:
     #                        'pwgan_vctk', 'mb_melgan_csmsc', 'style_melgan_csmsc',
     #                        'hifigan_csmsc', 'hifigan_ljspeech', 'hifigan_aishell3',
     #                        'hifigan_vctk', 'wavernn_csmsc']
-    voc: 'mb_melgan_csmsc'
+    voc: 'hifigan_aishell3'
     voc_config: 
     voc_ckpt: 
     voc_stat: 
 
     # others
-    lang: 'zh'
-    device:  # set 'gpu:id' or 'cpu'
+    lang: 'mix'
+    device: 'gpu:0' # set 'gpu:id' or 'cpu'
 
 
 ################### speech task: tts; engine_type: inference #######################
