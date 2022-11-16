@@ -72,6 +72,8 @@ def warm_up(engine_and_type: str, warm_up_time: int=3) -> bool:
         except Exception as e:
             logger.error("Failed to warm up on tts engine.")
             logger.error(e)
+            import traceback
+            traceback.print_exc()
             return False
 
     else:

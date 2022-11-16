@@ -206,8 +206,16 @@ def run_frontend(frontend: object,
             text, merge_sentences=merge_sentences, to_tensor=to_tensor)
         phone_ids = input_ids["phone_ids"]
     elif lang == 'mix':
-        input_ids = frontend.get_input_ids(
-            text, merge_sentences=merge_sentences, to_tensor=to_tensor)
+        if text.strip() != "" and re.match(r".*?<speak>.*?</speak>.*", text,
+                                           re.DOTALL):
+            input_ids = frontend.get_input_ids_ssml(
+                text,
+                merge_sentences=merge_sentences,
+                get_tone_ids=get_tone_ids,
+                to_tensor=to_tensor)
+        else:
+            input_ids = frontend.get_input_ids(
+                text, merge_sentences=merge_sentences, to_tensor=to_tensor)
         phone_ids = input_ids["phone_ids"]
     else:
         print("lang should in {'zh', 'en', 'mix'}!")

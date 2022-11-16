@@ -104,7 +104,7 @@ def tts(request_body: TTSRequest):
             sys.exit(-1)
 
         connection_handler = PaddleTTSConnectionHandler(tts_engine)
-        lang, target_sample_rate, duration, wav_base64 = connection_handler.run(
+        lang, target_sample_rate, duration, wav_base64, phone_ids, d_outs = connection_handler.run(
             text, spk_id, speed, volume, sample_rate)
 
         response = {
@@ -120,7 +120,9 @@ def tts(request_body: TTSRequest):
                 "volume": volume,
                 "sample_rate": target_sample_rate,
                 "duration": duration,
-                "audio": wav_base64
+                "audio": wav_base64,
+                "phone_ids": phone_ids,
+                "d_outs": d_outs,
             }
         }
     except ServerBaseException as e:

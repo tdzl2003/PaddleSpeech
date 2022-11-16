@@ -453,6 +453,9 @@ class TTSExecutor(BaseExecutor):
         self.voc_time = 0
         flags = 0
         phone_ids = frontend_dict['phone_ids']
+        self._outputs['phone_ids'] = [x.numpy() for x in phone_ids]
+        d_outs = []
+
         for i in range(len(phone_ids)):
             am_st = time.time()
             part_phone_ids = phone_ids[i]
@@ -464,8 +467,9 @@ class TTSExecutor(BaseExecutor):
             else:
                 # multi speaker
                 if am_dataset in {'aishell3', 'vctk', 'mix'}:
-                    mel = self.am_inference(
+                    mel, part_d_outs = self.am_inference(
                         part_phone_ids, spk_id=paddle.to_tensor(spk_id))
+                    d_outs.append(part_d_outs.numpy())
                 else:
                     mel = self.am_inference(part_phone_ids)
             self.am_time += (time.time() - am_st)
@@ -479,6 +483,7 @@ class TTSExecutor(BaseExecutor):
                 wav_all = paddle.concat([wav_all, wav])
             self.voc_time += (time.time() - voc_st)
         self._outputs['wav'] = wav_all
+        self._outputs['d_outs'] = d_outs
 
     def infer_onnx(self,
                    text: str,

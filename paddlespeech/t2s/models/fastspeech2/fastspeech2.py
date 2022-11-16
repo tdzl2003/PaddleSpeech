@@ -920,7 +920,7 @@ class FastSpeech2Inference(nn.Layer):
         normalized_mel, d_outs, p_outs, e_outs = self.acoustic_model.inference(
             text, spk_id=spk_id, spk_emb=spk_emb)
         logmel = self.normalizer.inverse(normalized_mel)
-        return logmel
+        return logmel, d_outs
 
 
 class StyleFastSpeech2Inference(FastSpeech2Inference):

@@ -281,6 +281,11 @@ class PaddleTTSConnectionHandler(TTSServerExecutor):
         logger.info("total generate audio time: {}".format(infer_time +
                                                            postprocess_time))
         logger.info("RTF: {}".format(rtf))
+        logger.info("phone_ids: {}".format(self._outputs['phone_ids']))
+        logger.info("d_outs: {}".format(self._outputs['d_outs']))
         logger.debug("device: {}".format(self.tts_engine.device))
 
-        return lang, target_sample_rate, duration, wav_base64
+        d_outs = self._outputs['d_outs']
+        durationScale = self.executor.voc_config.n_shift / self.executor.am_config.fs
+        d_outs = [x * durationScale for x in d_outs]
+        return lang, target_sample_rate, duration, wav_base64, self._outputs['phone_ids'], d_outs
