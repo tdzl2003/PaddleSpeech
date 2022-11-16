@@ -62,8 +62,9 @@ class TTSResult(BaseModel):
     volume: float = 1.0
     sample_rate: int
     duration: float
-    save_path: str = None
     audio: str
+    phone_ids: list
+    d_outs: list
 
 
 class TTSResponse(BaseModel):

@@ -72,7 +72,6 @@ def tts(request_body: TTSRequest):
     speed = request_body.speed
     volume = request_body.volume
     sample_rate = request_body.sample_rate
-    save_path = request_body.save_path
 
     # Check parameters
     if speed <= 0 or speed > 3:
@@ -83,10 +82,10 @@ def tts(request_body: TTSRequest):
         return failed_response(
             ErrorCode.SERVER_PARAM_ERR,
             "invalid volume value, the value should be between 0 and 3.")
-    if sample_rate not in [0, 16000, 8000]:
+    if sample_rate not in [0, 16000, 8000, 24000]:
         return failed_response(
             ErrorCode.SERVER_PARAM_ERR,
-            "invalid sample_rate value, the choice of value is 0, 8000, 16000.")
+            "invalid sample_rate value, the choice of value is 0, 8000, 16000, 24000.")
 
     # run
     try:
@@ -121,8 +120,8 @@ def tts(request_body: TTSRequest):
                 "sample_rate": target_sample_rate,
                 "duration": duration,
                 "audio": wav_base64,
-                "phone_ids": phone_ids,
-                "d_outs": d_outs,
+                "phone_ids": [x.tolist() for x in phone_ids],
+                "d_outs": [x.tolist() for x in d_outs],
             }
         }
     except ServerBaseException as e:
