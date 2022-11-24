@@ -1,1 +1,1 @@
-paddlespeech_client tts --spk_id 167 --server_ip 127.0.0.1 --port 8090 --input "»¶Ó­ ¡¾L C Moon¡¿ ¼ÓÈëÖ±²¥¼ä" --play True --output test.wav
+paddlespeech_client tts --spk_id 1 --server_ip 127.0.0.1 --port 8090 --input "æ¬¢è¿ ã€L C Moonã€‘ åŠ å…¥ç›´æ’­é—´" --play True
